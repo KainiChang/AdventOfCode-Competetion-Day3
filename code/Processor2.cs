@@ -1,49 +1,48 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace code;
 
-public class Processor1
+public class Processor2
 {
     public static long Process(char[,] matrix)
     {
-        long sum = 0;
-        HashSet<MatrixValue> numberList = GetNumbersSurroundingSymbol(matrix);
-        foreach (MatrixValue number in numberList)
-        {
-            if (number.Value.Length > 0){
-            sum += long.Parse(number.Value);}
-        }
-        return sum;
-
+        var result = GetProduct(matrix);
+        return result;
     }
 
-    public static HashSet<MatrixValue> GetNumbersSurroundingSymbol(char[,] matrix)
+    public static long GetProduct(char[,] matrix)
     {
         int numRows = matrix.GetLength(0);
         int numCols = matrix.GetLength(1);
-        HashSet<MatrixValue> numberList = new HashSet<MatrixValue>();
+        long product = 0;
+        long sum = 0;
         HashSet<char> symbols = new HashSet<char>
-        {
-            '*', '+', '-', '/', '$', '%', '@', '=', '#', '&'
-        };
+        {'*'};
         for (int i = 0; i < numRows; i++)
         {
             for (int j = 0; j < numCols; j++)
             {
-                if (symbols.Contains(matrix[i, j]))
+                if (!symbols.Contains(matrix[i, j])) continue;
+                HashSet<MatrixValue> numberList = new HashSet<MatrixValue>();
+
+                GetNumbersTop(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersBottom(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersTopLeft(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersTopRight(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersLeft(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersRight(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersBottomLeft(matrix, i, j, numRows, numCols, numberList);
+                GetNumbersBottomRight(matrix, i, j, numRows, numCols, numberList);
+                if (numberList.Count == 2)
                 {
-                    GetNumbersTop(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersBottom(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersTopLeft(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersTopRight(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersLeft(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersRight(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersBottomLeft(matrix, i, j, numRows, numCols, numberList);
-                    GetNumbersBottomRight(matrix, i, j, numRows, numCols, numberList);
+                    // first value multiply the sencond value
+                    product = long.Parse(numberList.ElementAt(0).Value) * long.Parse(numberList.ElementAt(1).Value);
+                    sum = sum + product;
                 }
             }
         }
-        return numberList;
+        return sum;
     }
-
     private static void GetNumbersTop(char[,] matrix, int row, int col, int numRows, int numCols, HashSet<MatrixValue> numberList)
     {
         if (row > 0 && char.IsDigit(matrix[row - 1, col]))
@@ -62,7 +61,10 @@ public class Processor1
                 number = number + matrix[i, colRight];
                 colRight++;
             }
-            numberList.Add(new MatrixValue(number, i, colLeft+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, colLeft + 1));
+            }
             // Console.WriteLine(number);
         }
     }
@@ -84,9 +86,11 @@ public class Processor1
                 number = number + matrix[i, colRight];
                 colRight++;
             }
-            numberList.Add(new MatrixValue(number, i, colLeft+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, colLeft + 1));
+            }
             // Console.WriteLine(number);
-
         }
     }
     private static void GetNumbersTopLeft(char[,] matrix, int row, int col, int numRows, int numCols, HashSet<MatrixValue> numberList)
@@ -113,7 +117,10 @@ public class Processor1
                     colRight++;
                 }
             }
-            numberList.Add(new MatrixValue(number, i, j+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, j + 1));
+            }
             // Console.WriteLine(number);
 
         }
@@ -136,7 +143,10 @@ public class Processor1
                 number = matrix[i, colLef] + number;
                 colLef--;
             }
-            numberList.Add(new MatrixValue(number, i, colLef+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, colLef + 1));
+            }
             // Console.WriteLine(number);
 
         }
@@ -152,7 +162,10 @@ public class Processor1
                 number = matrix[row, j] + number;
                 j--;
             }
-            numberList.Add(new MatrixValue(number, row, j+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, row, j + 1));
+            }
             // Console.WriteLine(number);
 
         }
@@ -168,7 +181,10 @@ public class Processor1
                 number += matrix[row, j];
                 j++;
             }
-            numberList.Add(new MatrixValue(number, row, col+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, row, col + 1));
+            }
             // Console.WriteLine(number);
 
         }
@@ -191,7 +207,10 @@ public class Processor1
                 number = number + matrix[i, colRight];
                 colRight++;
             }
-            numberList.Add(new MatrixValue(number, i, j+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, j + 1));
+            }
             // Console.WriteLine(number);
 
         }
@@ -215,7 +234,10 @@ public class Processor1
                 number = matrix[i, colLeft] + number;
                 colLeft--;
             }
-            numberList.Add(new MatrixValue(number, i, colLeft+1));
+            if (number.Length > 0)
+            {
+                numberList.Add(new MatrixValue(number, i, colLeft + 1));
+            }
             // Console.WriteLine(number);
 
         }
